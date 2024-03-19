@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: JeopardyAnimator
+  m_Controller: {fileID: 9100000, guid: 4af04bdf084681148b9b8ec9405a4449, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 7d81920b2b7a49b44894c1de3801b6e5, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: fe16ac6c91271cd459510f87f0a86d94, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 32040311bcf0de84f817cc9a4169d4c0, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 9ef8f02500276f049b6210bcb5c15cac, type: 2}
