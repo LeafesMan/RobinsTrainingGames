@@ -7,14 +7,22 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public Animator transition;
-    public GameObject startButton, homeButton, exitGameButton, backButton, nextButton, slideDisplay;
+    public GameObject startButton, homeButton, exitGameButton, backButton, nextButton, slideDisplay, quizDisplay;
+    public List<bool> screenType; //true for Slide Display & false for Quiz Display
+    public int counterCurrentScreen = 0;
+
     public List<STINFOQuestionsAndAnswers> QnA;
-    public List<bool> userAnswerList;
+    public bool[] userAnswerArray = new bool[16];
+    public TMP_Text questionText;
+    public TMP_Text[] answerChoice;
+    //public GameObject choice1, choice2, choice3, choice4;
+    public int counterQuiz = -1;
+
     public List<string> slideHeader = new List<string>();
     public List<string> slideInfo = new List<string>();
     public TMP_Text currentSlideHeader, currentSlideInfo;
-    public int counterSH = 0, counterSI = 0;
-    public int questionCounter;
+    public int counterSlideDisplay = 0;
+    
 
     //initializes the list of question and slide infomation
     void Start()
@@ -81,7 +89,7 @@ public class GameManager : MonoBehaviour
 
         //slide 10
         slideHeader.Add("AUTHORIZED DISTRIBUTION STATEMENTS");
-        slideInfo.Add("DISTRIBUTION STATEMENT A: Approved for public release; distribution is unlimited" +
+        slideInfo.Add("- DISTRIBUTION STATEMENT A: Approved for public release; distribution is unlimited" +
             "\n- DISTRIBUTION STATEMENT B: Distribution authorized to U.S.Government Agencies only (reason), (date of determination).Refer other requests for this document to(controlling DoD office)" +
             "\n- DISTRIBUTION STATEMENT C: Distribution authorized to U.S.Government Agencies and their contractors(reason), (date of determination).Other requests for this document shall be referred to(controlling DoD office). " +
             "\n- DISTRIBUTION STATEMENT D: Distribution authorized to DoD and U.S.DoD contractors only (reason), (date of determination).Other requests for this document shall be referred to(controlling DoD office)." +
@@ -135,8 +143,28 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        currentSlideHeader.text = slideHeader[counterSH];
-        currentSlideInfo.text = slideInfo[counterSH];
+        if (counterSlideDisplay >= 0)
+        {
+            currentSlideHeader.text = slideHeader[counterSlideDisplay];
+            currentSlideInfo.text = slideInfo[counterSlideDisplay];
+        }
+        
+        if (counterQuiz >= 0)
+        {
+            questionText.text = QnA[counterQuiz].question;
+            //come back later to see if I can have two buttons instead for the true/false questions
+            for (int i = 0; i < answerChoice.Length; i++)
+            {
+                if (i < QnA[counterQuiz].answers.Length)
+                {
+                    answerChoice[i].text = QnA[counterQuiz].answers[i];
+                }
+                else
+                {
+                    answerChoice[i].text = null;
+                }
+            }
+        }
     }
 
     //enter the whiteboard
@@ -148,18 +176,83 @@ public class GameManager : MonoBehaviour
         exitGameButton.SetActive(true);
         backButton.SetActive(true);
         nextButton.SetActive(true);
-        slideDisplay.SetActive(true);
+        slideDisplay.SetActive(screenType[counterCurrentScreen]);
+        quizDisplay.SetActive(!screenType[counterCurrentScreen]);
     }
 
     //exit out of the whiteboard
     public void zoomOut()
     {
         slideDisplay.SetActive(false);
+        quizDisplay.SetActive(false);
         exitGameButton.SetActive(false);
         backButton.SetActive(false);
         nextButton.SetActive(false);
         transition.SetTrigger("Start");
         homeButton.SetActive(true);
         startButton.SetActive(true);
+    }
+
+    public void nextSlide()
+    {
+        if(counterCurrentScreen < 27)
+        {
+            counterCurrentScreen++;
+            //input animation here later
+
+            if(screenType[counterCurrentScreen])
+            {
+                quizDisplay.SetActive(false);
+                counterSlideDisplay++;
+                slideDisplay.SetActive(true);
+            }
+            else
+            {
+                slideDisplay.SetActive(false);
+                counterQuiz++;
+                quizDisplay.SetActive(true);
+            }
+        }
+    }
+
+    public void previousSlide()
+    {
+        if (counterCurrentScreen > 0)
+        {
+            counterCurrentScreen--;
+            //input animation here later
+
+            if (screenType[counterCurrentScreen])
+            {
+                quizDisplay.SetActive(false);
+                counterSlideDisplay--;
+                //error where if we keep pressing the back button to the first slide the counter will be come negative
+                if(counterSlideDisplay < 0)
+                {
+                    counterSlideDisplay = 0;
+                }
+                slideDisplay.SetActive(true);
+            }
+            else
+            {
+                slideDisplay.SetActive(false);
+                counterQuiz--;
+                quizDisplay.SetActive(true);
+            }
+        }
+    }
+
+    public void checkAnswer(int userChoice)
+    {
+        if(userChoice == QnA[counterQuiz].correctAnswer)
+        {
+            userAnswerArray[counterQuiz] = true;
+            Debug.Log("The Answer is Correct!");
+        }
+        else
+        {
+            userAnswerArray[counterQuiz] = false;
+            Debug.Log("The Answer is Incorrect!");
+        }
     }
 }
